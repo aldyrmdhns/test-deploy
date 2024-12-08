@@ -1,0 +1,144 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Airports {
+  id                                         Int      @id @default(autoincrement())
+  name                                       String
+  city                                       String
+  country                                    String
+  continent                                  String
+  airportCode                                String   @unique
+  Routes_Routes_arrivalAirportIdToAirports   Routes[] @relation("Routes_arrivalAirportIdToAirports")
+  Routes_Routes_departureAirportIdToAirports Routes[] @relation("Routes_departureAirportIdToAirports")
+}
+
+model Bookings {
+  id             Int          @id @default(autoincrement())
+  userId         Int
+  flightId       Int
+  bookingCode    String
+  bookingDate    DateTime     @db.Timestamptz(3)
+  adultPassenger Int          @default(0)
+  childPassenger Int          @default(0)
+  babyPassenger  Int          @default(0)
+  status         String
+  bookerName     String
+  bookerEmail    String
+  bookerPhone    String
+  totalPrice     Int
+  tax            Int          @default(0)
+  Flights        Flights      @relation(fields: [flightId], references: [id], onDelete: Cascade)
+  Users          Users        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Passengers     Passengers[]
+  Payments       Payments?
+}
+
+model Flights {
+  id            Int         @id @default(autoincrement())
+  routeId       Int         @unique
+  planeId       Int         @unique
+  promotionId   Int?        @unique
+  duration      String
+  departureTime DateTime    @db.Timestamptz(3)
+  arrivalTime   DateTime    @db.Timestamptz(3)
+  flightCode    String
+  Bookings      Bookings[]
+  Planes        Planes      @relation(fields: [planeId], references: [id], onDelete: Cascade)
+  Promotions    Promotions? @relation(fields: [promotionId], references: [id])
+  Routes        Routes      @relation(fields: [routeId], references: [id], onDelete: Cascade)
+}
+
+model Passengers {
+  id              Int      @id @default(autoincrement())
+  bookingId       Int
+  title           String
+  fullName        String
+  familyName      String
+  birthDate       DateTime @db.Timestamptz(3)
+  nationality     String
+  identityNumber  String
+  identityCountry String
+  identityExpired DateTime @db.Timestamptz(3)
+  seatId          Int      @unique
+  Bookings        Bookings @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  Seats           Seats    @relation(fields: [seatId], references: [id], onDelete: Cascade)
+}
+
+model Payments {
+  id            Int      @id @default(autoincrement())
+  bookingId     Int      @unique
+  paymentMethod String
+  amount        Int
+  expiredDate   DateTime @db.Timestamptz(3)
+  status        String
+  Bookings      Bookings @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+}
+
+model Planes {
+  id           Int      @id @default(autoincrement())
+  planeName    String
+  totalSeat    Int
+  planeCode    String
+  description  String
+  airline      String
+  baggage      Int
+  cabinBaggage Int
+  Flights      Flights?
+  Seats        Seats[]
+}
+
+model Promotions {
+  id            Int      @id @default(autoincrement())
+  promotionName String
+  image         String
+  startDate     DateTime @db.Timestamptz(3)
+  endDate       DateTime @db.Timestamptz(3)
+  discount      Int
+  Flights       Flights?
+}
+
+model Routes {
+  id                                           Int         @id @default(autoincrement())
+  departureAirportId                           Int
+  arrivalAirportId                             Int
+  seatClassId                                  Int         @unique
+  Flights                                      Flights?
+  Airports_Routes_arrivalAirportIdToAirports   Airports    @relation("Routes_arrivalAirportIdToAirports", fields: [arrivalAirportId], references: [id], onDelete: Cascade)
+  Airports_Routes_departureAirportIdToAirports Airports    @relation("Routes_departureAirportIdToAirports", fields: [departureAirportId], references: [id], onDelete: Cascade)
+  SeatClasses                                  SeatClasses @relation(fields: [seatClassId], references: [id], onDelete: Cascade)
+}
+
+model SeatClasses {
+  id         Int     @id @default(autoincrement())
+  name       String
+  priceAdult Int
+  priceChild Int
+  priceBaby  Int
+  Routes     Routes?
+}
+
+model Seats {
+  id          Int         @id @default(autoincrement())
+  planeId     Int
+  seatNumber  String
+  isAvailable Boolean
+  Passengers  Passengers?
+  Planes      Planes      @relation(fields: [planeId], references: [id], onDelete: Cascade)
+}
+
+model Users {
+  id          Int        @id @default(autoincrement())
+  name        String
+  email       String     @unique
+  phoneNumber String
+  password    String
+  isActivated Boolean
+  role        String     @default("user")
+  Bookings    Bookings[]
+}
