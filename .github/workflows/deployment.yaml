@@ -16,10 +16,10 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Set up Node.js
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v3
       with:
         node-version: '18'
 
@@ -27,11 +27,11 @@ jobs:
       run: npm install
 
     - name: Authenticate with Google Cloud
-      uses: google-github-actions/auth@v0
+      uses: google-github-actions/auth@v1
       with:
         credentials_json: ${{ secrets.GCP_SA_KEY }}
     - name: Deploy to Google App Engine
-      uses: google-github-actions/deploy-appengine@v0
+      uses: google-github-actions/deploy-appengine@v1
       with:
         project_id: ${{ secrets.GCP_PROJECT_ID }}
         key_file: ${{ secrets.GCP_SA_KEY }}
