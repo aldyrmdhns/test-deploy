@@ -36,3 +36,5 @@ jobs:
         project_id: ${{ secrets.GCP_PROJECT_ID }}
         key_file: ${{ secrets.GCP_SA_KEY }}
         app_yaml_path: app.yaml
+      env:
+        DATABASE_URL: ${{ secrets.DATABASE_URL }}
