@@ -35,8 +35,8 @@ jobs:
       uses: google-github-actions/deploy-appengine@v1
       with:
         project_id: ${{ secrets.GCP_PROJECT_ID }}
-        key_file: ${{ secrets.GCP_SA_KEY }}
-        app_yaml_path: app.yaml
+        env_vars: |
+          DATABASE_URL=${{ secrets.DATABASE_URL }}
+          NODE_ENV=production
       env:
-        DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        NODE_ENV: "production"
+        GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
