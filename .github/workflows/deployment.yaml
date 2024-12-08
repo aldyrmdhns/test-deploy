@@ -1,0 +1,38 @@
+name: Deploy Node.js Backend API to Google App Engine
+
+# Trigger on push to branches (for feature branches or main) and pull request to main
+on:
+  push:
+    branches:
+      - main
+      - 'feature/*'  # Trigger on feature branches
+  pull_request:
+    branches:
+      - main  # Trigger when a pull request is made to the main branch
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '16'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Authenticate with Google Cloud
+      uses: google-github-actions/auth@v0
+      with:
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
+    - name: Deploy to Google App Engine
+      uses: google-github-actions/deploy-appengine@v0
+      with:
+        project_id: ${{ secrets.GCP_PROJECT_ID }}
+        key_file: ${{ secrets.GCP_SA_KEY }}
+        app_yaml_path: app.yaml
