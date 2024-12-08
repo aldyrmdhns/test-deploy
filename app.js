@@ -10,7 +10,7 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 app.get("/test", (req, res) => {
-	res.send("Now I try the action and it should be fine! ...try number what now??");
+	res.send("Now I try the action and it should be fine! ...try number what now?? another one now");
 });
 
 app.get("/flight", async (req, res) => {
